@@ -10,7 +10,7 @@ async def handle_client(websocket, path):
     except websockets.exceptions.ConnectionClosedError:
         print("Connection closed")
 
-start_server = websockets.serve(handle_client, "localhost", 8765)
+start_server = websockets.serve(handle_client, "localhost", 8001)
 
 asyncio.get_event_loop().run_until_complete(start_server)
 asyncio.get_event_loop().run_forever()
