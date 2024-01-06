@@ -1,16 +1,25 @@
 import asyncio
 import websockets
 
-async def handle_client(websocket, path):
-    try:
-        while True:
-            message = await websocket.recv()
-            print(f"Received message: {message}")
-            await websocket.send(f"Echo: {message}")
-    except websockets.exceptions.ConnectionClosedError:
-        print("Connection closed")
+class ChatServer:
+    def __init__(self, host, port):
+        self.host = host
+        self.port = port
 
-start_server = websockets.serve(handle_client, "localhost", 8001)
+    async def handle_client(self, websocket, path):
+        try:
+            while True:
+                message = await websocket.recv()
+                print(f"Received message: {message}")
+                await websocket.send(f"Echo: {message}")
+        except websockets.exceptions.ConnectionClosedError:
+            print("Connection closed")
 
-asyncio.get_event_loop().run_until_complete(start_server)
-asyncio.get_event_loop().run_forever()
+    def start(self):
+        start_server = websockets.serve(self.handle_client, self.host, self.port)
+        asyncio.get_event_loop().run_until_complete(start_server)
+        asyncio.get_event_loop().run_forever()
+
+if __name__ == "__main__":
+    chat_server = ChatServer("localhost", 8001)
+    chat_server.start()
