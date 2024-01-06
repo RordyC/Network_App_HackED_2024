@@ -1,14 +1,30 @@
-import asyncio
-import websockets
+import threading
+import socket
+alias = input('NAME: >>> ')
+client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+client.connect(('127.0.0.1', 59000))
 
-async def send_message():
-    uri = "ws://localhost:8001"
-    async with websockets.connect(uri) as websocket:
-        while True:
-            message = input("Enter message: ")
-            await websocket.send(message)
-            response = await websocket.recv()
-            print(f"Server response: {response}")
+def client_receive():
+    while True:
+        try:
+            message = client.recv(1024).decode('utf-8')
+            if message == "alias?":
+                client.send(alias.encode('utf-8'))
+            else:
+                print(message)
+        except:
+            print('Error!')
+            client.close()
+            break
 
-asyncio.get_event_loop().run_until_complete(send_message())
-#just trying to get the structure up
+def client_send():
+    while True:
+        message = f'{alias}: {input("")}'
+        client.send(message.encode('utf-8'))
+
+
+receive_thread = threading.Thread(target=client_receive)
+receive_thread.start()
+
+send_thread = threading.Thread(target=client_send)
+send_thread.start()
